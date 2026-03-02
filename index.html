@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EPA 即時評核平台 | 住院病患照護與衛教</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        teal: { 50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 300: '#5eead4', 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 800: '#115e59', 900: '#134e4a', }
+                    },
+                    animation: { 'aurora': 'aurora 15s ease infinite', },
+                    keyframes: { aurora: { '0%, 100%': { 'background-position': '0% 50%' }, '50%': { 'background-position': '100% 50%' }, } }
+                }
+            }
+        }
+    </script>
+    <style>
+        .bg-aurora { background: linear-gradient(-45deg, #0d9488, #2dd4bf, #0ea5e9, #38bdf8); background-size: 400% 400%; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        select { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-800 font-sans antialiased selection:bg-teal-200 selection:text-teal-900">
+
+    <main class="max-w-md mx-auto bg-white min-h-screen shadow-2xl relative pb-28">
+        
+        <!-- Header -->
+        <header class="bg-aurora animate-aurora text-white px-6 pt-12 pb-8 rounded-b-3xl shadow-lg relative z-10">
+            <div class="flex items-center justify-between mb-2">
+                <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-medium tracking-wider backdrop-blur-sm">
+                    <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Sheets Sync
+                </span>
+                <span class="text-xs font-light opacity-80">15s Quick Eval</span>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight mb-1">即時評核平台</h1>
+            <p class="text-teal-50 text-sm font-medium opacity-90"><i class="fa-solid fa-bed-pulse mr-2"></i>住院病患的照護與衛教</p>
+        </header>
+
+        <!-- 表單 -->
+        <form id="epa-form" class="px-6 py-6 space-y-8">
+            
+            <div class="space-y-2">
+                <label for="teacher" class="block text-sm font-bold text-teal-800 flex items-center"><i class="fa-solid fa-user-doctor text-teal-500 w-5"></i> 評核教師</label>
+                <div class="relative">
+                    <select id="teacher" required class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-base rounded-2xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all cursor-pointer">
+                        <option value="" disabled selected>請選擇指導醫師</option>
+                        <option value="張建民 醫師 (Attending)">張建民 醫師 (Attending)</option>
+                        <option value="林雅惠 醫師 (Attending)">林雅惠 醫師 (Attending)</option>
+                        <option value="陳韋辰 醫師 (Chief Resident)">陳韋辰 醫師 (Chief Resident)</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label for="student" class="block text-sm font-bold text-teal-800 flex items-center"><i class="fa-solid fa-user-graduate text-teal-500 w-5"></i> 學員姓名</label>
+                <div class="relative">
+                    <select id="student" required class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-base rounded-2xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all cursor-pointer">
+                        <option value="" disabled selected>請選擇受評學員</option>
+                        <option value="李小明 (PGY1)">李小明 (PGY1)</option>
+                        <option value="王大志 (PGY1)">王大志 (PGY1)</option>
+                        <option value="蔡佳玲 (PGY2)">蔡佳玲 (PGY2)</option>
+                        <option value="吳柏毅 (Clerk)">吳柏毅 (Clerk)</option>
+                        <option value="黃詩婷 (Clerk)">黃詩婷 (Clerk)</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label for="date" class="block text-sm font-bold text-teal-800 flex items-center"><i class="fa-solid fa-calendar-check text-teal-500 w-5"></i> 評核日期</label>
+                <input type="date" id="date" required class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-base rounded-2xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all">
+            </div>
+
+            <hr class="border-slate-100">
+
+            <div class="space-y-3">
+                <label class="block text-sm font-bold text-teal-800 flex items-center">
+                    <i class="fa-solid fa-tags text-teal-500 w-5"></i> 核心能力展現 <span class="text-xs text-slate-400 font-normal ml-2">(可多選)</span>
+                </label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button" class="comp-btn border border-slate-200 bg-white text-slate-600 rounded-xl py-3 px-2 text-sm font-medium transition-all active:scale-95" data-selected="false" data-val="PC">病人照護 (PC)</button>
+                    <button type="button" class="comp-btn border border-slate-200 bg-white text-slate-600 rounded-xl py-3 px-2 text-sm font-medium transition-all active:scale-95" data-selected="false" data-val="MK">醫學知識 (MK)</button>
+                    <button type="button" class="comp-btn border border-slate-200 bg-white text-slate-600 rounded-xl py-3 px-2 text-sm font-medium transition-all active:scale-95" data-selected="false" data-val="ICS">溝通技巧 (ICS)</button>
+                    <button type="button" class="comp-btn border border-slate-200 bg-white text-slate-600 rounded-xl py-3 px-2 text-sm font-medium transition-all active:scale-95" data-selected="false" data-val="P">專業素養 (P)</button>
+                    <button type="button" class="comp-btn border border-slate-200 bg-white text-slate-600 rounded-xl py-3 px-2 text-sm font-medium transition-all active:scale-95" data-selected="false" data-val="PBLI">工作學習 (PBLI)</button>
+                    <button type="button" class="comp-btn border border-slate-200 bg-white text-slate-600 rounded-xl py-3 px-2 text-sm font-medium transition-all active:scale-95" data-selected="false" data-val="SBP">制度臨床 (SBP)</button>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <label class="block text-sm font-bold text-teal-800 flex items-center mb-4"><i class="fa-solid fa-stairs text-teal-500 w-5"></i> 信賴等級評估 (EPA Level)</label>
+                <div class="flex flex-col gap-2 relative" id="epa-container">
+                    <input type="hidden" id="selected_epa" required>
+                    <button type="button" class="epa-btn relative w-full text-left px-5 py-4 rounded-2xl transition-all duration-200 ease-in-out bg-teal-50 text-teal-900 border border-transparent shadow-sm hover:shadow-md active:scale-[0.98]" data-level="Level 1">
+                        <div class="font-bold text-base">Level 1</div><div class="text-xs opacity-80 mt-1">只看不做 (Observe only)</div>
+                        <i class="fa-solid fa-circle-check absolute right-5 top-1/2 transform -translate-y-1/2 text-xl opacity-0 transition-opacity text-teal-600 check-icon"></i>
+                    </button>
+                    <button type="button" class="epa-btn relative w-full text-left px-5 py-4 rounded-2xl transition-all duration-200 ease-in-out bg-teal-100 text-teal-900 border border-transparent shadow-sm hover:shadow-md active:scale-[0.98]" data-level="Level 2a">
+                        <div class="font-bold text-base">Level 2a</div><div class="text-xs opacity-80 mt-1">直接監督，逐步協助</div>
+                        <i class="fa-solid fa-circle-check absolute right-5 top-1/2 transform -translate-y-1/2 text-xl opacity-0 transition-opacity text-teal-600 check-icon"></i>
+                    </button>
+                    <button type="button" class="epa-btn relative w-full text-left px-5 py-4 rounded-2xl transition-all duration-200 ease-in-out bg-teal-200 text-teal-900 border border-transparent shadow-sm hover:shadow-md active:scale-[0.98]" data-level="Level 2b">
+                        <div class="font-bold text-base">Level 2b</div><div class="text-xs opacity-80 mt-1">直接監督，必要時協助</div>
+                        <i class="fa-solid fa-circle-check absolute right-5 top-1/2 transform -translate-y-1/2 text-xl opacity-0 transition-opacity text-teal-700 check-icon"></i>
+                    </button>
+                    <button type="button" class="epa-btn relative w-full text-left px-5 py-4 rounded-2xl transition-all duration-200 ease-in-out bg-teal-300 text-teal-900 border border-transparent shadow-sm hover:shadow-md active:scale-[0.98]" data-level="Level 3a">
+                        <div class="font-bold text-base">Level 3a</div><div class="text-xs opacity-80 mt-1">間接監督，事後逐項確認</div>
+                        <i class="fa-solid fa-circle-check absolute right-5 top-1/2 transform -translate-y-1/2 text-xl opacity-0 transition-opacity text-teal-800 check-icon"></i>
+                    </button>
+                    <button type="button" class="epa-btn relative w-full text-left px-5 py-4 rounded-2xl transition-all duration-200 ease-in-out bg-teal-400 text-teal-900 border border-transparent shadow-sm hover:shadow-md active:scale-[0.98]" data-level="Level 3b">
+                        <div class="font-bold text-base">Level 3b</div><div class="text-xs opacity-80 mt-1">間接監督，事後重點確認</div>
+                        <i class="fa-solid fa-circle-check absolute right-5 top-1/2 transform -translate-y-1/2 text-xl opacity-0 transition-opacity text-teal-900 check-icon"></i>
+                    </button>
+                    <button type="button" class="epa-btn relative w-full text-left px-5 py-4 rounded-2xl transition-all duration-200 ease-in-out bg-teal-500 text-white border border-transparent shadow-sm hover:shadow-md active:scale-[0.98]" data-level="Level 3c">
+                        <div class="font-bold text-base">Level 3c</div><div class="text-xs opacity-90 mt-1">間接監督，必要時確認</div>
+                        <i class="fa-solid fa-circle-check absolute right-5 top-1/2 transform -translate-y-1/2 text-xl opacity-0 transition-opacity text-white check-icon"></i>
+                    </button>
+                    <button type="button" class="epa-btn relative w-full text-left px-5 py-4 rounded-2xl transition-all duration-200 ease-in-out bg-teal-600 text-white border border-transparent shadow-sm hover:shadow-md active:scale-[0.98]" data-level="Level 4">
+                        <div class="font-bold text-base">Level 4</div><div class="text-xs opacity-90 mt-1">獨立執行 (Independent)</div>
+                        <i class="fa-solid fa-circle-check absolute right-5 top-1/2 transform -translate-y-1/2 text-xl opacity-0 transition-opacity text-white check-icon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <hr class="border-slate-100">
+
+            <div class="space-y-3 pb-4">
+                <label for="feedback" class="block text-sm font-bold text-teal-800 flex items-center"><i class="fa-solid fa-comment-medical text-teal-500 w-5"></i> 教學回饋與輔導</label>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" class="quick-tag bg-teal-50 text-teal-700 border border-teal-200 px-3 py-1.5 rounded-full text-xs font-medium hover:bg-teal-100 transition-colors active:scale-95 shadow-sm"><i class="fa-solid fa-plus mr-1 opacity-50"></i>能主動釐清病史</button>
+                    <button type="button" class="quick-tag bg-teal-50 text-teal-700 border border-teal-200 px-3 py-1.5 rounded-full text-xs font-medium hover:bg-teal-100 transition-colors active:scale-95 shadow-sm"><i class="fa-solid fa-plus mr-1 opacity-50"></i>衛教語氣需更具同理心</button>
+                    <button type="button" class="quick-tag bg-teal-50 text-teal-700 border border-teal-200 px-3 py-1.5 rounded-full text-xs font-medium hover:bg-teal-100 transition-colors active:scale-95 shadow-sm"><i class="fa-solid fa-plus mr-1 opacity-50"></i>能掌握照護重點</button>
+                </div>
+                <textarea id="feedback" rows="4" placeholder="請輸入對學員的具體觀察與建議..." class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-base rounded-2xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all resize-none"></textarea>
+            </div>
+
+        </form>
+
+        <!-- 懸浮送出按鈕 -->
+        <div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-white via-white to-transparent rounded-b-3xl">
+            <button type="button" id="submit-btn" class="w-full bg-aurora animate-aurora text-white font-bold text-lg py-4 rounded-2xl shadow-lg hover:shadow-teal-500/30 transition-all active:scale-[0.98] flex items-center justify-center">
+                <i class="fa-solid fa-cloud-arrow-up mr-2"></i> 送出評核資料
+            </button>
+        </div>
+
+        <!-- 訊息 Toast -->
+        <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl flex items-center transition-all duration-300 opacity-0 pointer-events-none z-50 text-white w-max max-w-[90%]">
+            <i id="toast-icon" class="fa-solid mr-2 text-xl"></i>
+            <span id="toast-msg" class="font-medium text-sm sm:text-base"></span>
+        </div>
+
+    </main>
+
+    <script>
+        // ！！！重要：請將下方替換為您部署後取得的 Apps Script Web App URL！！！
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrt9IOynLK5v3Cb_ySmFAI-HSFz4XqTTAadDpO9Mqibmlpnp_IqyNeozRL9JSqkvTdVw/exec"; 
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. 自動設定今日日期
+            const dateInput = document.getElementById('date');
+            const today = new Date();
+            dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+            // 2. 核心能力 (多選 Toggle)
+            const compBtns = document.querySelectorAll('.comp-btn');
+            compBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const isSelected = this.getAttribute('data-selected') === 'true';
+                    this.setAttribute('data-selected', !isSelected);
+                    this.classList.toggle('bg-teal-600', !isSelected);
+                    this.classList.toggle('text-white', !isSelected);
+                    this.classList.toggle('shadow-md', !isSelected);
+                    this.classList.toggle('bg-white', isSelected);
+                    this.classList.toggle('text-slate-600', isSelected);
+                });
+            });
+
+            // 3. 信賴等級 EPA (單選)
+            const epaBtns = document.querySelectorAll('.epa-btn');
+            const hiddenEpaInput = document.getElementById('selected_epa');
+            epaBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    epaBtns.forEach(b => {
+                        b.classList.remove('ring-4', 'ring-teal-400', 'ring-opacity-50', 'scale-[1.02]', 'z-10');
+                        b.querySelector('.check-icon').classList.replace('opacity-100', 'opacity-0');
+                    });
+                    this.classList.add('ring-4', 'ring-teal-400', 'ring-opacity-50', 'scale-[1.02]', 'z-10');
+                    this.querySelector('.check-icon').classList.replace('opacity-0', 'opacity-100');
+                    hiddenEpaInput.value = this.getAttribute('data-level');
+                });
+            });
+
+            // 4. 快速回饋標籤
+            const quickTags = document.querySelectorAll('.quick-tag');
+            const feedbackTextarea = document.getElementById('feedback');
+            quickTags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    const textToAdd = this.innerText.trim(); 
+                    feedbackTextarea.value = feedbackTextarea.value ? `${feedbackTextarea.value}；${textToAdd}` : textToAdd;
+                    this.classList.add('bg-teal-200');
+                    setTimeout(() => this.classList.remove('bg-teal-200'), 200);
+                });
+            });
+
+            // Toast 提示函數
+            function showToast(type, message, duration = 3000) {
+                const toast = document.getElementById('toast');
+                const icon = document.getElementById('toast-icon');
+                document.getElementById('toast-msg').innerText = message;
+                
+                toast.classList.remove('bg-slate-800', 'bg-red-600', 'opacity-0', '-translate-y-4');
+                icon.className = 'fa-solid mr-2 text-xl ';
+                
+                if(type === 'success') {
+                    toast.classList.add('bg-slate-800', 'opacity-100', 'translate-y-0');
+                    icon.classList.add('fa-circle-check', 'text-teal-400');
+                } else {
+                    toast.classList.add('bg-red-600', 'opacity-100', 'translate-y-0');
+                    icon.classList.add('fa-triangle-exclamation', 'text-white');
+                }
+
+                setTimeout(() => {
+                    toast.classList.replace('opacity-100', 'opacity-0');
+                    toast.classList.replace('translate-y-0', '-translate-y-4');
+                }, duration);
+            }
+
+            // 5. 實際送出至 Google Sheets
+            const submitBtn = document.getElementById('submit-btn');
+            
+            submitBtn.addEventListener('click', async () => {
+                const teacher = document.getElementById('teacher').value;
+                const student = document.getElementById('student').value;
+                const epa = hiddenEpaInput.value;
+
+                if (!teacher || !student || !epa) {
+                    showToast('error', '請確認已選擇教師、學員與信賴等級！');
+                    return;
+                }
+
+                // 檢查是否尚未填寫真實的 Google Script URL
+                if (GOOGLE_SCRIPT_URL === "在此貼上您的_WEB_APP_URL" || !GOOGLE_SCRIPT_URL.startsWith('http')) {
+                    showToast('error', '尚未設定 Google Apps Script 網址！請先於程式碼第 187 行替換為真實網址。', 5000);
+                    return;
+                }
+
+                // 收集已選的核心能力
+                const selectedComps = Array.from(document.querySelectorAll('.comp-btn[data-selected="true"]'))
+                                          .map(btn => btn.getAttribute('data-val'))
+                                          .join(', ');
+
+                // 準備 Payload
+                const payload = {
+                    date: document.getElementById('date').value,
+                    teacher: teacher,
+                    student: student,
+                    competencies: selectedComps,
+                    epa: epa,
+                    feedback: feedbackTextarea.value
+                };
+
+                // 按鈕載入狀態
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> 同步至雲端中...';
+                submitBtn.classList.add('opacity-80', 'cursor-not-allowed', 'pointer-events-none');
+                
+                try {
+                    const response = await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        // 使用 text/plain 避免 CORS preflight (OPTIONS) 錯誤
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+
+                    if(result.status === 'success') {
+                        showToast('success', '評核已成功同步至 Google Sheets');
+                        
+                        // 重置表單 (保留日期與教師)
+                        document.getElementById('student').selectedIndex = 0;
+                        hiddenEpaInput.value = '';
+                        feedbackTextarea.value = '';
+                        compBtns.forEach(b => {
+                            b.setAttribute('data-selected', 'false');
+                            b.classList.remove('bg-teal-600', 'text-white', 'shadow-md');
+                            b.classList.add('bg-white', 'text-slate-600');
+                        });
+                        epaBtns.forEach(b => {
+                            b.classList.remove('ring-4', 'ring-teal-400', 'ring-opacity-50', 'scale-[1.02]', 'z-10');
+                            b.querySelector('.check-icon').classList.replace('opacity-100', 'opacity-0');
+                        });
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else {
+                        throw new Error(result.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('error', '同步失敗，請檢查網路或網址設定。');
+                } finally {
+                    // 恢復按鈕狀態
+                    submitBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up mr-2"></i> 送出評核資料';
+                    submitBtn.classList.remove('opacity-80', 'cursor-not-allowed', 'pointer-events-none');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
