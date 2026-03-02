@@ -61,7 +61,10 @@
             </div>
 
             <div class="space-y-2">
-                <label for="student" class="block text-sm font-bold text-teal-800 flex items-center"><i class="fa-solid fa-user-graduate text-teal-500 w-5"></i> 學員姓名</label>
+                <div class="flex justify-between items-center">
+                    <label for="student" class="block text-sm font-bold text-teal-800 flex items-center"><i class="fa-solid fa-user-graduate text-teal-500 w-5"></i> 學員姓名</label>
+                    <button type="button" id="add-student-btn" class="text-xs bg-teal-100 text-teal-700 px-3 py-1.5 rounded-full hover:bg-teal-200 transition-colors active:scale-95 font-medium shadow-sm"><i class="fa-solid fa-user-plus mr-1"></i>新增學員</button>
+                </div>
                 <div class="relative">
                     <select id="student" required class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-base rounded-2xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all cursor-pointer">
                         <option value="" disabled selected>請選擇受評學員</option>
@@ -146,7 +149,13 @@
         </form>
 
         <!-- 懸浮送出按鈕 -->
-        <div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-white via-white to-transparent rounded-b-3xl">
+        <div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-white via-white to-transparent rounded-b-3xl space-y-3">
+            <div class="flex items-center space-x-2">
+                <input type="number" id="auto-test-count" min="1" max="50" value="5" class="w-16 h-12 bg-white border-2 border-dashed border-teal-300 text-teal-700 text-base font-bold rounded-2xl px-2 focus:outline-none focus:ring-2 focus:ring-teal-400 text-center shadow-sm" title="產生個案數">
+                <button type="button" id="auto-test-btn" class="flex-1 bg-white border-2 border-dashed border-teal-300 text-teal-600 font-bold text-sm py-3 rounded-2xl shadow-sm hover:bg-teal-50 transition-all active:scale-[0.98] flex items-center justify-center">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> 批次自動產生並送出
+                </button>
+            </div>
             <button type="button" id="submit-btn" class="w-full bg-aurora animate-aurora text-white font-bold text-lg py-4 rounded-2xl shadow-lg hover:shadow-teal-500/30 transition-all active:scale-[0.98] flex items-center justify-center">
                 <i class="fa-solid fa-cloud-arrow-up mr-2"></i> 送出評核資料
             </button>
@@ -235,6 +244,26 @@
                 }, duration);
             }
 
+            // 直接新增單一學員邏輯
+            const addStudentBtn = document.getElementById('add-student-btn');
+            const studentSelect = document.getElementById('student');
+            let newStudentCounter = 1;
+
+            addStudentBtn.addEventListener('click', () => {
+                // 直接動態產生一位學員選項
+                const option = document.createElement('option');
+                const newName = `新增測試學員 ${newStudentCounter} (New)`;
+                option.value = newName;
+                option.text = newName;
+                studentSelect.appendChild(option);
+                newStudentCounter++;
+
+                showToast('success', `已直接新增：${newName}`);
+                
+                // 自動展開並選取最新加入的一位，方便直接送出測試
+                studentSelect.selectedIndex = studentSelect.options.length - 1;
+            });
+
             // 5. 實際送出至 Google Sheets
             const submitBtn = document.getElementById('submit-btn');
             
@@ -311,6 +340,131 @@
                     submitBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up mr-2"></i> 送出評核資料';
                     submitBtn.classList.remove('opacity-80', 'cursor-not-allowed', 'pointer-events-none');
                 }
+            });
+
+            // 6. 批次自動產生並送出測試資料
+            const autoTestBtn = document.getElementById('auto-test-btn');
+            const autoTestCountInput = document.getElementById('auto-test-count');
+            
+            autoTestBtn.addEventListener('click', async () => {
+                const count = parseInt(autoTestCountInput.value, 10);
+                if (isNaN(count) || count <= 0) {
+                    showToast('error', '請輸入大於 0 的個案數！');
+                    return;
+                }
+
+                if (GOOGLE_SCRIPT_URL === "在此貼上您的_WEB_APP_URL" || !GOOGLE_SCRIPT_URL.startsWith('http')) {
+                    showToast('error', '尚未設定 Google Apps Script 網址！', 5000);
+                    return;
+                }
+
+                autoTestBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> 批次傳送中...';
+                autoTestBtn.classList.add('opacity-80', 'cursor-not-allowed', 'pointer-events-none');
+                submitBtn.classList.add('opacity-80', 'pointer-events-none');
+                
+                let successCount = 0;
+                
+                // 擬真姓名庫
+                const lastNames = ['陳','林','黃','張','李','王','吳','劉','蔡','楊','許','鄭','謝','郭','洪'];
+                const firstNames = ['小明','大華','建國','雅婷','佳玲','志明','春嬌','柏宇','詩涵','承恩','冠宇','欣怡','俊傑','品妃','韋辰'];
+                const levels = ['(PGY1)', '(PGY2)', '(Clerk)', '(Intern)'];
+
+                for (let k = 0; k < count; k++) {
+                    // 1. 隨機選教師
+                    const teacherSelect = document.getElementById('teacher');
+                    teacherSelect.selectedIndex = Math.floor(Math.random() * (teacherSelect.options.length - 1)) + 1;
+
+                    // 2. 自動產生逼真的學員姓名
+                    const option = document.createElement('option');
+                    const randomName = lastNames[Math.floor(Math.random() * lastNames.length)] + 
+                                       firstNames[Math.floor(Math.random() * firstNames.length)] + 
+                                       " " + levels[Math.floor(Math.random() * levels.length)];
+                    option.value = randomName;
+                    option.text = randomName;
+                    studentSelect.appendChild(option);
+                    studentSelect.selectedIndex = studentSelect.options.length - 1;
+
+                    // 3. 隨機選 1~3 個核心能力
+                    compBtns.forEach(b => {
+                        b.setAttribute('data-selected', 'false');
+                        b.classList.remove('bg-teal-600', 'text-white', 'shadow-md');
+                        b.classList.add('bg-white', 'text-slate-600');
+                    });
+                    const shuffledComps = Array.from(compBtns).sort(() => 0.5 - Math.random());
+                    const numComps = Math.floor(Math.random() * 3) + 1;
+                    const selectedCompsArr = [];
+                    for(let i=0; i<numComps; i++) {
+                        shuffledComps[i].click();
+                        selectedCompsArr.push(shuffledComps[i].getAttribute('data-val'));
+                    }
+
+                    // 4. 隨機選一個 EPA 等級
+                    const randomEpaIndex = Math.floor(Math.random() * epaBtns.length);
+                    epaBtns[randomEpaIndex].click();
+                    const epaVal = epaBtns[randomEpaIndex].getAttribute('data-level');
+
+                    // 5. 自動填寫逼真回饋
+                    const feedbacks = [
+                        "表現優良，衛教說明清楚，能安撫病患情緒。", 
+                        "建議多練習理學檢查與病史詢問的連貫性。",
+                        "醫學知識扎實，能提出合適的處置建議。",
+                        "交班順暢，能掌握病患照護的重點與急迫性。",
+                        "語氣具同理心，與家屬溝通十分順暢。",
+                        "對於用藥指示的衛教可以再更口語化一些。"
+                    ];
+                    feedbackTextarea.value = feedbacks[Math.floor(Math.random() * feedbacks.length)];
+
+                    // 準備 Payload
+                    const payload = {
+                        date: document.getElementById('date').value,
+                        teacher: teacherSelect.value,
+                        student: studentSelect.value,
+                        competencies: selectedCompsArr.join(', '),
+                        epa: epaVal,
+                        feedback: feedbackTextarea.value
+                    };
+
+                    showToast('success', `正在傳送第 ${k + 1}/${count} 筆資料...`, 1500);
+
+                    try {
+                        const response = await fetch(GOOGLE_SCRIPT_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                            body: JSON.stringify(payload)
+                        });
+                        const result = await response.json();
+                        if(result.status === 'success') {
+                            successCount++;
+                        }
+                    } catch(e) {
+                        console.error(e);
+                    }
+                    
+                    // 刻意延遲 800ms，讓您能看到表單自動變換的過程
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                }
+
+                // 恢復按鈕狀態
+                autoTestBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-2"></i> 批次自動產生並送出';
+                autoTestBtn.classList.remove('opacity-80', 'cursor-not-allowed', 'pointer-events-none');
+                submitBtn.classList.remove('opacity-80', 'pointer-events-none');
+                
+                showToast('success', `大功告成！已成功送出 ${successCount} 筆個案。`, 4000);
+                
+                // 重置表單
+                studentSelect.selectedIndex = 0;
+                hiddenEpaInput.value = '';
+                feedbackTextarea.value = '';
+                compBtns.forEach(b => {
+                    b.setAttribute('data-selected', 'false');
+                    b.classList.remove('bg-teal-600', 'text-white', 'shadow-md');
+                    b.classList.add('bg-white', 'text-slate-600');
+                });
+                epaBtns.forEach(b => {
+                    b.classList.remove('ring-4', 'ring-teal-400', 'ring-opacity-50', 'scale-[1.02]', 'z-10');
+                    b.querySelector('.check-icon').classList.replace('opacity-100', 'opacity-0');
+                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         });
     </script>
